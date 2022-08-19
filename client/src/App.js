@@ -7,18 +7,19 @@ function App() {
    
   const checkOut = async () => {
     const productData = {
-      0: [{id: 1},{tittle:"MENS COTTON JACKET"},{price: 75.00}],
-      1:[{id:2},{tittle:"SANDISK SSD PLUS 1TB"},{price:160.00}]
+      items:[
+     {id: 1,name:"MENS COTTON JACKET",price: 75.00,quantity:1},
+     {id:2,name:"SANDISK SSD PLUS 1TB",price:160.00,quantity:2}]
 
     }
     const response = await axios.post("http://localhost:5000/",{
       headers: {
         'Content-Type': 'application/json'
         },
-        data: JSON.stringify(productData)
+        data: (productData)
      
     })
-    console.log(response.data);
+    window.location.href = (response.data.url);
   }
   return (
     <div className="App">
