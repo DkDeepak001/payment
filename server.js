@@ -15,34 +15,43 @@ app.route("/")
     console.log("home hitted");
 })
 .post(async (req, res) => {
+    
     try {
-        console.log(req.body.data.items.map(e => e.name));
         const session = await stripe.checkout.sessions.create({
             payment_method_types: ["card"],
             mode: "payment",
-           
-            line_items: req.body.data.items.map((item) => {
-            //     const storeItems =  storeItems.get(item.id);
-            return {
-               
-                price_data:{
-                    currency:"usd",
-                    product_data:{
-                        name:"MENS COTTON JACKET"
+            customer_email:"dpakeswar@gmail.com",
+            line_items:req.body.data.items.map((items) => {
+                return { 
+                    price_data:{
+                        currency:"usd",
+                        product_data:{
+                            name:items.name
+                        },
+                        unit_amount:items.price * 100,
                     },
-                    unit_amount :7500,
-                },
-                quantity:1
-            }
-        }),
-        success_url:`${process.env.SERVER_URL}/`,
-        cancel_url:`${process.env.SERVER_URL}/`
-    })
+                    quantity:items.quantity
+                 }
+                 
+            }),
+            success_url:`${process.env.SERVER_URL}/sucess/{CHECKOUT_SESSION_ID}`,
+            cancel_url:`${process.env.SERVER_URL}/failed`
+        })
+        console.log(session)
     res.json({ url: session.url })
 } catch (error) {
     res.json({error: error});
 }
 })
+app.route(`/checkPayment/:id`)
+    .post(async (req,res) => {
+    const session = await stripe.checkout.sessions.retrieve(req.params.id);
+    // const customer = await stripe.customers.retrieve(session.customer);
+   res.status(200).json(session);
+    // console.log(customer);
+
+    console.log(req.params.id);
+    })
 
 app.listen(5000,()=>{
     console.log("server listing on port 5000");
